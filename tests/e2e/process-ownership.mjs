@@ -3,6 +3,31 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+function isSystemdUserReaper(pid) {
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, "utf8");
+    const fields = stat.slice(stat.lastIndexOf(")") + 2).split(" ");
+    const uid = process.getuid?.();
+    const status = readFileSync(`/proc/${pid}/status`, "utf8");
+    const owner = status.match(/^Uid:\s+(\d+)/m)?.[1];
+    const cgroup = readFileSync(`/proc/${pid}/cgroup`, "utf8");
+    const args = readFileSync(`/proc/${pid}/cmdline`, "utf8")
+      .split("\0")
+      .filter(Boolean);
+    return (
+      uid !== undefined &&
+      stat.slice(stat.indexOf("(") + 1, stat.lastIndexOf(")")) === "systemd" &&
+      fields[1] === "1" &&
+      owner === String(uid) &&
+      cgroup.includes(`/user-${uid}.slice/user@${uid}.service/init.scope`) &&
+      args[0] === "/usr/lib/systemd/systemd" &&
+      args[1] === "--user"
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function managedPiHelperCommand(name, executable, argv, root) {
   const broker = join(root, "pi-intercom/broker/broker.ts");
   const cli = join(root, "tsx/dist/cli.mjs");
@@ -130,7 +155,11 @@ export function nativeHelperCleanup(
               reason = "changed-ancestor-identity";
               break;
             }
-            if (current.parent !== anchor.parent && current.parent !== 1) {
+            if (
+              current.parent !== anchor.parent &&
+              current.parent !== 1 &&
+              !isSystemdUserReaper(current.parent)
+            ) {
               reason = "changed-ancestor-parent";
               break;
             }
@@ -144,6 +173,16 @@ export function nativeHelperCleanup(
             }
             brokerSeen ||= ancestor.helperOwner === "pi-intercom";
           }
+          // Linux may reparent a proven helper to this user's systemd
+          // manager instead of PID 1. Verify the exact manager before ending
+          // the observed ancestry walk; the original ancestry still reached
+          // the owned host above.
+          if (
+            graph === observed &&
+            postBaselineIntercom &&
+            isSystemdUserReaper(ancestor.parent)
+          )
+            break;
           if (graph === original) ancestors.push(cursor);
           // A host exit can reparent a proven startup helper to Linux init.
           if (graph === observed && ancestor.parent === 1) break;

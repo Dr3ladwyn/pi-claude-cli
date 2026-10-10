@@ -133,7 +133,7 @@ console.log(JSON.stringify({ compiledExecutable: process.execPath, nativeVersion
     expect(evidence.compiledExecutable).toBe(
       await realpath(compiledBunExecutable!),
     );
-    expect(evidence.nativeVersion).toBe("18.4.4");
+    expect(evidence.nativeVersion).toBe("18.8.6");
     expect(evidence.testedPackage).toEqual({
       name: expectedPackage.name,
       version: expectedPackage.version,

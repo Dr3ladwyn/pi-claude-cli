@@ -202,7 +202,20 @@ for (const trusted of [true, false])
         [...host.initialIdentities.values()],
         true,
       );
-      assert.equal(proof.allowedHelperCount, trusted ? 1 : 0);
+      assert.equal(
+        proof.allowedHelperCount,
+        trusted ? 1 : 0,
+        JSON.stringify({
+          proof,
+          hostPid: host.child.pid,
+          forced: cleanup.forcedChildren.map((pid) => ({
+            observed: cleanup.observedProcesses.find(
+              (process) => process.pid === pid,
+            ),
+            original: host.initialIdentities.get(pid),
+          })),
+        }),
+      );
       assert.equal(proof.rejectedCount, trusted ? 0 : 1);
     } finally {
       if (!cleanup) await host.close();

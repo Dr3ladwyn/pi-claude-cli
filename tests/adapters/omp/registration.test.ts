@@ -32,7 +32,7 @@ vi.mock("@oh-my-pi/pi-ai", async () => {
     createAssistantMessageEventStream: native.createAssistantMessageEventStream,
   };
 });
-vi.mock("@oh-my-pi/pi-coding-agent", () => ({ VERSION: "18.4.4" }));
+vi.mock("@oh-my-pi/pi-coding-agent", () => ({ VERSION: "18.8.6" }));
 import {
   assertOmpVersion,
   registerOmpAdapter,
@@ -59,8 +59,9 @@ function setup() {
 }
 describe("OMP discovery and native registration", () => {
   it("guards the exact approved native version", () => {
-    expect(() => assertOmpVersion("18.4.4")).not.toThrow();
-    expect(() => assertOmpVersion("18.4.3")).toThrow("requires OMP 18.4.4");
+    expect(() => assertOmpVersion("18.8.6")).not.toThrow();
+    expect(() => assertOmpVersion("18.8.5")).toThrow("requires OMP 18.8.6");
+    expect(() => assertOmpVersion("18.8.7")).toThrow("requires OMP 18.8.6");
   });
   it("exposes a native default entrypoint", () => {
     expect(typeof entrypoint).toBe("function");

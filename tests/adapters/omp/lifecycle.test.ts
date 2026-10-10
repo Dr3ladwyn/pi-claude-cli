@@ -26,7 +26,7 @@ vi.mock("@oh-my-pi/pi-ai", async () => {
     getBundledModels: () => [],
   };
 });
-vi.mock("@oh-my-pi/pi-coding-agent", () => ({ VERSION: "18.4.4" }));
+vi.mock("@oh-my-pi/pi-coding-agent", () => ({ VERSION: "18.8.6" }));
 import { registerOmpAdapter } from "../../../src/adapters/omp/index.js";
 import { OmpLifecycle } from "../../../src/adapters/omp/lifecycle.js";
 

@@ -38,10 +38,10 @@ jobs:
           mkdir -p "$SCRATCH/t" "$SCRATCH/bin"
           chmod 700 "$SCRATCH" "$SCRATCH/t"
           curl --fail --location --retry 3 --output "$SCRATCH/bin/omp" \
-            https://github.com/can1357/oh-my-pi/releases/download/v18.4.4/omp-linux-x64
-          echo "24c830fceb0bd6884bf5bf2c7a2b7407bc23fafe655e924c695ef9be308e46f3  $SCRATCH/bin/omp" | sha256sum --check
+            https://github.com/can1357/oh-my-pi/releases/download/v18.8.6/omp-linux-x64
+          echo "877acdc48384b80fe4c083b1e610433d28922dd9fccde9ea430aaace8765b19b  $SCRATCH/bin/omp" | sha256sum --check
           chmod 755 "$SCRATCH/bin/omp"
-          test "$("$SCRATCH/bin/omp" --version)" = "omp/18.4.4"
+          test "$("$SCRATCH/bin/omp" --version)" = "omp/18.8.6"
           echo "TMPDIR=$SCRATCH/t" >> "$GITHUB_ENV"
           echo "PCC_COMPILED_BUN_EXECUTABLE=$SCRATCH/bin/omp" >> "$GITHUB_ENV"
       - run: npm run typecheck

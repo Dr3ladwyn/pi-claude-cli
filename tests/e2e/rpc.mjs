@@ -112,7 +112,7 @@ export function assertSocketCapacity(sandbox) {
 
 export function configureHostIsolation(host, sandbox) {
   if (host !== "omp") return;
-  // OMP18.4.4 treats inherited CLAUDE_CONFIG_DIR as a user discovery opt-in.
+  // OMP 18.8.6 treats inherited CLAUDE_CONFIG_DIR as a user discovery opt-in.
   // Its native settings filter these discovery providers before MCP loading.
   writeFileSync(
     join(sandbox, "host-isolation.yml"),
@@ -205,7 +205,7 @@ export function preflight(host, env) {
     timeout: 10000,
   });
   assert.equal(version.status, 0, "Host --version prerequisite failed");
-  const expected = host === "pi" ? "0.99.1" : "18.4.4";
+  const expected = host === "pi" ? "0.99.1" : "18.8.6";
   assert.match(
     version.stdout,
     new RegExp(`(^|\\D)${expected.replaceAll(".", "\\.")}(\\D|$)`),

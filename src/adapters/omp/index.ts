@@ -18,7 +18,7 @@ import type { ClaudeRuntime } from "../../contracts/index.js";
 import { payloadForHook, replacePayload, toRequest } from "./request.js";
 import { projectRound } from "./stream.js";
 
-export const OMP_VERSION = "18.4.4";
+export const OMP_VERSION = "18.8.6";
 export function assertOmpVersion(version: string): void {
   if (version !== OMP_VERSION)
     throw new Error(
