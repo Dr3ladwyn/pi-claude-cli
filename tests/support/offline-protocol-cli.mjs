@@ -3,14 +3,15 @@
 import { readFile } from "node:fs/promises";
 import { writeFileSync, renameSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { runScenario } from "./protocol-scenario.mjs";
 
 const args = process.argv.slice(2);
 if (args.includes("--version"))
   process.stdout.write("2.1.285 (Offline protocol transport)\n");
 else {
+  const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+  const { StdioClientTransport } =
+    await import("@modelcontextprotocol/sdk/client/stdio.js");
+  const { runScenario } = await import("./protocol-scenario.mjs");
   const flag = (name) => args[args.indexOf(name) + 1];
   const config = JSON.parse(await readFile(flag("--mcp-config"), "utf8"));
   const sessionId = process.env.PCC_SCENARIO_SESSION;
