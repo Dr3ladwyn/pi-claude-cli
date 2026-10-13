@@ -3,14 +3,16 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { spawn } from "node:child_process";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
 const args = process.argv.slice(2);
 if (args.includes("--version")) {
   process.stdout.write(
     (process.env.PCC_VERSION ?? "2.1.285") + " (Offline Claude double)\n",
   );
 } else {
+  const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+  const { StdioClientTransport } =
+    await import("@modelcontextprotocol/sdk/client/stdio.js");
   const flag = (name) => args[args.indexOf(name) + 1];
   const config = JSON.parse(await readFile(flag("--mcp-config"), "utf8"));
   if (process.env.PCC_RECEIPT)
