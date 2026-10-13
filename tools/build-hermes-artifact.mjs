@@ -72,6 +72,7 @@ await cp(
   join(root, "tools", "install-hermes-artifact.py"),
   join(output, "install.py"),
 );
+await cp(join(root, "LICENSE"), join(output, "LICENSE"));
 await writeFile(
   join(runtime, "package.json"),
   JSON.stringify(
