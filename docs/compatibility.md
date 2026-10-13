@@ -6,12 +6,12 @@ This modernization targets current releases only. There isn't a legacy Pi adapte
 | ---------------------------------- | ---------------- |
 | Node.js                            | 22.19.0 or newer |
 | Canonical Pi (`@earendil-works/*`) | 0.99.1           |
-| Oh My Pi (`@oh-my-pi/*`)           | 18.8.6           |
+| Oh My Pi (`@oh-my-pi/*`)           | ^18.8.6          |
 | Published Claude Code executable   | 2.1.285          |
 | Official Claude Agent SDK          | 0.3.285, pinned  |
 | MCP SDK                            | 1.31.0, pinned   |
 
-The CLI driver checks the executable version before inference. OMP support is an exact contract, not an open-ended semver range: OMP 18.8.6 was validated against its published `@oh-my-pi/pi-coding-agent` and `pi-ai` APIs and is the only accepted OMP release. Other OMP versions fail explicitly until their APIs are verified. The root entrypoint and provider ID remain `pi-claude-cli`.
+The CLI driver checks the executable version before inference. The OMP adapter doesn't reject hosts by version number. It uses the host's native APIs and checks that its required catalog export is available before registration. OMP peer dependencies accept compatible 18.x releases from 18.8.6; development dependencies stay pinned to 18.8.6 for reproducible typechecks and offline tests. A later version loading successfully doesn't establish full inference compatibility. The root entrypoint and provider ID remain `pi-claude-cli`.
 
 The CLI host-tool bridge uses a private Unix-domain socket and process-group cleanup. Windows isn't supported by this driver. Linux is the current live-verification environment; macOS support requires its own live evidence. SDK transport also needs a supported official Claude executable/runtime.
 
