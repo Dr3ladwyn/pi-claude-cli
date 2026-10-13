@@ -30,6 +30,23 @@ with-env { PI_CLAUDE_DRIVER: "sdk" } { pi -e ./index.ts }
 
 The package manifest exposes `pi.extensions` and `omp.extensions` for each host's package discovery. The root entrypoint loads Pi; `./omp` loads OMP. See [supported versions](docs/compatibility.md).
 
+## Hermes model-provider
+
+`hermes/` contains a separate Hermes plugin registered as `pi-claude-cli`. It runs the compiled Node worker over versioned NDJSON and reuses this repository's core plus the selectable CLI/Agent SDK driver. Hermes still owns its native tools and approvals. The worker stays resident across tool-result calls.
+
+Build and install the local artifact from Nushell:
+
+```nu
+$env.HERMES_BUILD_DIR = ($env.HOME | path join "dev" "agentic-scratchpads" "pi-claude-cli" "hermes-provider-build")
+npm run typecheck:hermes
+npm run build:hermes
+let profile_home = ($env.HERMES_HOME? | default ($env.HOME | path join ".hermes"))
+^python3 ($env.HERMES_BUILD_DIR | path join "install.py") --artifact $env.HERMES_BUILD_DIR --profile-home $profile_home
+with-env { PI_CLAUDE_DRIVER: "sdk" } { hermes --provider pi-claude-cli -m opus }
+```
+
+Select `pi-claude-cli` in Hermes's model picker. The SDK route above uses its version-paired official runtime. The shared default CLI driver deliberately requires Claude Code 2.1.285; a newer global binary is rejected unless you select an existing supported executable. `PI_CLAUDE_AUTH=api-key` is an explicit billing choice and uses the existing `ANTHROPIC_API_KEY` configuration. The plugin doesn't read Hermes/Pi OAuth credentials or provide subscription usage. The installer refuses an existing provider directory and doesn't change active model or login settings. See [Hermes installation, behavior and limits](hermes/README.md).
+
 ## Tools and sessions
 
 Each host supplies its effective tools and native JSON schemas. Claude calls them through the reserved `host` MCP namespace; Pi or OMP executes them, and the correlated results return to the parked Claude request. The runtime keeps a resident process/query across host tool rounds rather than killing Claude at an assistant-message boundary. For a completed batch, the host may execute proposed calls before every MCP handler arrives. The core holds those results until each actual handler matches the completed call's ID, name and arguments.

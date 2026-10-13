@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": [
+    "src/adapters/hermes-worker/**/*.ts",
+    "entrypoints/**/*.ts",
+    "src/core/**/*.ts",
+    "src/contracts/**/*.ts",
+    "src/drivers/**/*.ts"
+  ]
+}
