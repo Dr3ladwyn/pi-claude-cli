@@ -34,7 +34,18 @@ The package manifest exposes `pi.extensions` and `omp.extensions` for each host'
 
 `hermes/` contains a separate Hermes plugin registered as `pi-claude-cli`. It runs the compiled Node worker over versioned NDJSON and reuses this repository's core plus the selectable CLI/Agent SDK driver. Hermes still owns its native tools and approvals. The worker stays resident across tool-result calls.
 
-Build and install the local artifact from Nushell:
+For the published Python distribution, install into the interpreter that runs Hermes, then explicitly download and verify its worker before model calls:
+
+```nu
+python -m pip install hermes-claude-bridge==0.5.0
+hermes-claude-bridge setup
+hermes-claude-bridge status
+hermes plugins enable pi-claude-cli
+```
+
+The first worker release supports Linux x64 and requires Node >=22.19. See the [Python package guide](python/README.md) for cache ownership, checksums and offline setup. No worker downloads or builds happen on import or inference. API-key authentication is recommended for third-party products; subscription use is subject to Anthropic's terms and isn't an endorsement or ban guarantee.
+
+Alternatively, build and install the local artifact from Nushell:
 
 ```nu
 $env.HERMES_BUILD_DIR = ($env.HOME | path join "dev" "agentic-scratchpads" "pi-claude-cli" "hermes-provider-build")

@@ -10,10 +10,11 @@ from providers import register_provider
 from providers.base import ProviderProfile, OMIT_TEMPERATURE
 
 from .client import HermesClaudeClient, to_transcript, validate_request
+from .worker_location import default_worker_path, require_worker
 
 PLUGIN_ROOT = Path(__file__).resolve().parent
 
-DEFAULT_WORKER = PLUGIN_ROOT / "runtime" / "src" / "adapters" / "hermes-worker" / "index.js"
+DEFAULT_WORKER = default_worker_path(PLUGIN_ROOT)
 class HermesClaudeProfile(ProviderProfile):
     """Claude Code login/API-key transport owned by this repository."""
 
@@ -22,9 +23,14 @@ class HermesClaudeProfile(ProviderProfile):
         command = client_kwargs.get("command") or os.environ.get("PI_CLAUDE_HERMES_NODE") or shutil.which("node") or "node"
         worker = os.environ.get("PI_CLAUDE_HERMES_WORKER")
         supplied_args = client_kwargs.get("args")
-        args = tuple(supplied_args) if isinstance(supplied_args, (tuple, list)) else (worker or str(DEFAULT_WORKER),)
         if worker:
             args = (worker,)
+        elif isinstance(supplied_args, (tuple, list)):
+            args = tuple(str(arg) for arg in supplied_args)
+        else:
+            args = (str(DEFAULT_WORKER),)
+        if args == (str(DEFAULT_WORKER),):
+            require_worker(DEFAULT_WORKER)
         return HermesClaudeClient(command=str(command), args=tuple(str(arg) for arg in args), client_kwargs=client_kwargs)
 
 

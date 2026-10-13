@@ -25,10 +25,10 @@ The `npm trust` CLI requires npm 11.15.0 or newer. Publishing via OIDC requires 
 
 Authenticated tests consume account resources and remain opt-in. Existing live receipts establish runtime behavior; a release also needs an installed-package check. Keep receipts and logs under `~/dev/agentic-scratchpads/pi-claude-cli/`, outside the published package.
 
-If pushing a tag doesn't start Actions, dispatch the workflow from `main` with the existing release tag (substitute the version being released):
+If pushing a tag doesn't start Actions, dispatch the workflow from the existing release tag (substitute the version being released):
 
 ```nu
-gh workflow run publish.yml --ref main --field tag=v0.4.3
+gh workflow run publish.yml --ref v0.5.0 --field tag=v0.5.0
 ```
 
 The workflow resolves the tag to an immutable commit and runs the release gates against it. Publication uses the workflow's actual GitHub source commit for provenance and requires its tarball to be byte-for-byte identical to the tag's tarball. A difference in any packaged file blocks publication. Don't override `GITHUB_REF` or `GITHUB_SHA`: npm checks those values against the signing certificate's source identity.
@@ -71,6 +71,22 @@ with-env { PI_CLAUDE_BOUNDARY_E2E: "1", PI_CLAUDE_BOUNDARY_INSTALLED: "1" } { np
 ```
 
 This suite defaults to Sonnet 5.5; `PI_CLAUDE_BOUNDARY_MODEL` overrides the model. It requires exact installed and managed package versions, native admission and consumption receipts, the original tool result once, correction text in the answer, and natural process cleanup. It retains failed receipts instead of treating queue admission as proof that Claude followed the correction.
+
+## Coordinated Hermes release
+
+Version 0.5.0 adds PyPI distribution `hermes-claude-bridge` while preserving the npm name and all host provider IDs. The Python distribution packages the authoritative Python facade, not a separate implementation of the TypeScript core. Both distributions must have matching versions.
+
+The PyPI pending publisher uses owner `ramarivera`, repository `pi-claude-cli`, workflow filename `publish.yml`, and environment `pypi`. The GitHub environment permits release tags matching `v*`. Configure the pending publisher on the PyPI account page before the first release; subsequent releases use the same GitHub OIDC publisher without a stored PyPI token. Dispatch retries against the existing tag, not `main`, so the environment rule and source identity match.
+
+The workflow runs the offline gates before building a Linux x64 worker archive, SHA256 manifest and Python wheel/sdist. The wheel embeds the worker digest generated from the actual archive. It qualifies the installed wheel and explicit local setup before any registry publication. After npm publication, it creates the GitHub release with worker and Python assets, then publishes only the wheel/sdist to PyPI through its dedicated OIDC job. Python publication waits for worker assets to be available. There is no atomic transaction across npm, GitHub and PyPI; inspect each target before retrying a partial run, and never replace an already published artifact with different bytes.
+
+Installation into active Pi, OMP or Hermes profiles is separate from publication. Do not change Toolbox pins, login, model selection or running profiles as part of a release-only authorization. Linux x64 is the first worker platform. The Python wheel itself is portable, but setup rejects platforms without a qualified matching worker.
+
+Users install the Python distribution into the interpreter running Hermes, then explicitly run `hermes-claude-bridge setup`. Setup downloads and verifies the pinned GitHub archive before inference. Importing the provider or making a model call never downloads or builds a runtime. The legacy local bundle installer remains available as a release asset. Node >=22.19 is required.
+
+Before calling the release complete, independently fetch both registry records and artifacts, verify npm integrity/provenance and PyPI file digests, and install each public distribution into isolated scratch environments. Exercise Python setup against the public GitHub asset and discovery through the real Hermes entrypoint registry. Reuse the offline native reply fixture for a real Hermes tool loop; authenticated inference needs its separate bounded approval.
+
+Official-runtime delegation isn't an Anthropic endorsement or a ban guarantee. Subscription use remains subject to the account's terms, including restrictions on third-party products offering Claude.ai login or subscription limits without approval. Public/commercial integrations should use API-key authentication or obtain the required Anthropic approval. The bridge doesn't read or relay subscription credentials; the official runtime owns authentication. See the [Agent SDK documentation](https://platform.claude.com/docs/en/agent-sdk/overview) and [Claude Code legal guidance](https://code.claude.com/docs/en/legal-and-compliance).
 
 ## Manual fallback
 

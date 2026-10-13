@@ -7,3 +7,6 @@ package-lock.json
 .planning/
 .beads/
 .dolt/
+*.egg-info/
+python/build/
+__pycache__/

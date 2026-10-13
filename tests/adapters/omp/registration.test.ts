@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as OmpAI from "@oh-my-pi/pi-ai";
+import type * as OmpCatalog from "@oh-my-pi/pi-catalog/models";
 import type {
   ExtensionAPI,
   ExtensionContext,
@@ -77,8 +78,13 @@ describe("OMP discovery and native registration", () => {
     expect(typeof entrypoint).toBe("function");
   });
   it("rejects a missing native catalog capability before registration", () => {
-    const catalog = vi.spyOn(OmpAI, "getBundledModels", "get");
-    catalog.mockReturnValue(undefined as never);
+    const catalog = vi.spyOn(
+      OmpAI as typeof OmpAI &
+        Partial<Pick<typeof OmpCatalog, "getBundledModels">>,
+      "getBundledModels",
+      "get",
+    );
+    catalog.mockReturnValue(undefined);
     const host = setup();
     try {
       expect(() => registerOmpAdapter(host.api)).toThrow(

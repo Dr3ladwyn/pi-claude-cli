@@ -47,6 +47,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run typecheck:pi
       - run: npm run typecheck:omp
+      - run: npm run typecheck:hermes
       - run: npm run lint
       - run: npm run format:check
       - name: Validate committed implementation plan
@@ -66,7 +67,7 @@ jobs:
           for (const path of [pkg.main, "README.md", "LICENSE", ...Object.values(pkg.exports)]) {
             assert(files.has(path.replace(/^\.\//, "")), `Package is missing ${path}`);
           }
-          assert(![...files].some(path => /^(tests|node_modules|openspec)\//.test(path)), "Package includes development files");
+          assert(![...files].some(path => /^(tests|node_modules|openspec)\//.test(path) || path.includes("__pycache__") || /\.py[co]$/.test(path)), "Package includes development files");
           NODE
 
   macos:
