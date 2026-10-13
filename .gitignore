@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 dist/
 coverage/
 *.tsbuildinfo
@@ -10,3 +10,7 @@ coverage/
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+
+# Python provider/test caches
+__pycache__/
+*.py[cod]

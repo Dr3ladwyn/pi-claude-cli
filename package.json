@@ -65,7 +65,9 @@
     "test:contracts": "vitest run tests/contracts tests/conformance --reporter=dot",
     "verify:plan": "node openspec/changes/modernize-claude-runtime/sync-beads.mjs",
     "typecheck:pi": "tsc --noEmit -p tsconfig.pi.json",
-    "typecheck:omp": "tsc --noEmit -p tsconfig.omp.json"
+    "typecheck:omp": "tsc --noEmit -p tsconfig.omp.json",
+    "typecheck:hermes": "tsc --noEmit -p tsconfig.hermes.json",
+    "build:hermes": "node tools/build-hermes-artifact.mjs"
   },
   "type": "module",
   "engines": {
@@ -83,12 +85,16 @@
     "./core": "./src/core/index.ts",
     "./cli": "./src/drivers/cli/index.ts",
     "./sdk": "./src/drivers/sdk/index.ts",
-    "./contracts": "./src/contracts/index.ts"
+    "./contracts": "./src/contracts/index.ts",
+    "./hermes-worker": "./src/adapters/hermes-worker/index.ts"
   },
   "files": [
     "index.ts",
     "entrypoints",
     "src",
+    "hermes",
+    "tools",
+    "tsconfig.hermes.json",
     "docs",
     "README.md",
     "LICENSE"
