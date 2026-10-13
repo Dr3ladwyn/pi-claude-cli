@@ -1,4 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as OmpAI from "@oh-my-pi/pi-ai";
+import type * as OmpCatalog from "@oh-my-pi/pi-catalog/models";
 import type {
   ExtensionAPI,
   ExtensionContext,
@@ -32,11 +34,13 @@ vi.mock("@oh-my-pi/pi-ai", async () => {
     createAssistantMessageEventStream: native.createAssistantMessageEventStream,
   };
 });
-vi.mock("@oh-my-pi/pi-coding-agent", () => ({ VERSION: "18.8.6" }));
-import {
-  assertOmpVersion,
-  registerOmpAdapter,
-} from "../../../src/adapters/omp/index.js";
+const hostVersion = vi.hoisted(() => ({ value: "18.10.2" }));
+vi.mock("@oh-my-pi/pi-coding-agent", () => ({
+  get VERSION() {
+    return hostVersion.value;
+  },
+}));
+import { registerOmpAdapter } from "../../../src/adapters/omp/index.js";
 import entrypoint from "../../../entrypoints/omp.js";
 
 function setup() {
@@ -58,13 +62,39 @@ function setup() {
   };
 }
 describe("OMP discovery and native registration", () => {
-  it("guards the exact approved native version", () => {
-    expect(() => assertOmpVersion("18.8.6")).not.toThrow();
-    expect(() => assertOmpVersion("18.8.5")).toThrow("requires OMP 18.8.6");
-    expect(() => assertOmpVersion("18.8.7")).toThrow("requires OMP 18.8.6");
+  beforeEach(() => {
+    hostVersion.value = "18.10.2";
   });
+  it.each(["18.8.6", "18.8.7", "18.10.2", "19.0.0"])(
+    "registers against host capabilities rather than OMP version %s",
+    (version) => {
+      hostVersion.value = version;
+      const host = setup();
+      expect(() => registerOmpAdapter(host.api)).not.toThrow();
+      expect(host.registerProvider).toHaveBeenCalledOnce();
+    },
+  );
   it("exposes a native default entrypoint", () => {
     expect(typeof entrypoint).toBe("function");
+  });
+  it("rejects a missing native catalog capability before registration", () => {
+    const catalog = vi.spyOn(
+      OmpAI as typeof OmpAI &
+        Partial<Pick<typeof OmpCatalog, "getBundledModels">>,
+      "getBundledModels",
+      "get",
+    );
+    catalog.mockReturnValue(undefined);
+    const host = setup();
+    try {
+      expect(() => registerOmpAdapter(host.api)).toThrow(
+        "OMP native extension catalog export is unavailable",
+      );
+      expect(host.registerProvider).not.toHaveBeenCalled();
+      expect(host.on).not.toHaveBeenCalled();
+    } finally {
+      catalog.mockRestore();
+    }
   });
   it("registers the provider and uses the shared configuration/runtime factory", async () => {
     const host = setup();

@@ -1,7 +1,6 @@
 import * as OmpAI from "@oh-my-pi/pi-ai";
 import type * as OmpCatalog from "@oh-my-pi/pi-catalog/models";
 import { createAssistantMessageEventStream } from "@oh-my-pi/pi-ai";
-import { VERSION } from "@oh-my-pi/pi-coding-agent";
 import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
 import {
   createConfiguredRuntime,
@@ -18,13 +17,6 @@ import type { ClaudeRuntime } from "../../contracts/index.js";
 import { payloadForHook, replacePayload, toRequest } from "./request.js";
 import { projectRound } from "./stream.js";
 
-export const OMP_VERSION = "18.8.6";
-export function assertOmpVersion(version: string): void {
-  if (version !== OMP_VERSION)
-    throw new Error(
-      `pi-claude-cli requires OMP ${OMP_VERSION}; loaded ${version}`,
-    );
-}
 export interface OmpAdapterOptions {
   configuration?: RuntimeConfiguration;
   runtimeFactory?: (
@@ -35,7 +27,6 @@ export function registerOmpAdapter(
   api: ExtensionAPI,
   options: OmpAdapterOptions = {},
 ): void {
-  assertOmpVersion(VERSION);
   // OMP's extension loader re-exports the native catalog from its retained ai root.
   // Type-only catalog import avoids resolving a second catalog in compiled hosts.
   const { getBundledModels } = OmpAI as typeof OmpAI &
