@@ -21,14 +21,16 @@ import {
   type PiSessionState,
 } from "./lifecycle.js";
 
+import { createVersionCheck } from "../../version-policy.js";
+
 export const PROVIDER_ID = "pi-claude-cli";
 export const SUPPORTED_PI_VERSION = "0.99.1";
-export function assertPiVersion(version: string): void {
-  if (version !== SUPPORTED_PI_VERSION)
-    throw new Error(
-      `pi-claude-cli requires Pi ${SUPPORTED_PI_VERSION}; loaded ${version}`,
-    );
-}
+export const SUPPORTED_PI_RANGE = ">=0.99.1 <0.100.0";
+export const assertPiVersion = createVersionCheck(
+  "Pi",
+  SUPPORTED_PI_VERSION,
+  "0.100.0",
+);
 export interface PiAdapterOptions {
   configuration?: RuntimeConfiguration;
   runtimeFactory?: (

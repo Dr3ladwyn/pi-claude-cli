@@ -28,7 +28,7 @@ Authenticated tests consume account resources and remain opt-in. Existing live r
 If pushing a tag doesn't start Actions, dispatch the workflow from the existing release tag (substitute the version being released):
 
 ```nu
-gh workflow run publish.yml --ref v0.5.0 --field tag=v0.5.0
+gh workflow run publish.yml --ref v0.5.1 --field tag=v0.5.1
 ```
 
 The workflow resolves the tag to an immutable commit and runs the release gates against it. Publication uses the workflow's actual GitHub source commit for provenance and requires its tarball to be byte-for-byte identical to the tag's tarball. A difference in any packaged file blocks publication. Don't override `GITHUB_REF` or `GITHUB_SHA`: npm checks those values against the signing certificate's source identity.
@@ -74,7 +74,7 @@ This suite defaults to Sonnet 5.5; `PI_CLAUDE_BOUNDARY_MODEL` overrides the mode
 
 ## Coordinated Hermes release
 
-Version 0.5.0 adds PyPI distribution `hermes-claude-bridge` while preserving the npm name and all host provider IDs. The Python distribution packages the authoritative Python facade, not a separate implementation of the TypeScript core. Both distributions must have matching versions.
+Version 0.5.0 adds PyPI distribution `hermes-claude-bridge` while preserving the npm name and all host provider IDs. The Python distribution packages the authoritative Python facade, not a separate implementation of the TypeScript core. Both distributions must have matching versions. For 0.5.1, update the npm manifest/lockfile, Python package/setup metadata and version constants, Hermes plugin/cache locator, and current installation examples together. Add the release entry to `CHANGELOG.md`.
 
 The PyPI pending publisher uses owner `ramarivera`, repository `pi-claude-cli`, workflow filename `publish.yml`, and environment `pypi`. The GitHub environment permits release tags matching `v*`. Configure the pending publisher on the PyPI account page before the first release; subsequent releases use the same GitHub OIDC publisher without a stored PyPI token. Dispatch retries against the existing tag, not `main`, so the environment rule and source identity match.
 

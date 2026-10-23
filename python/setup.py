@@ -51,7 +51,7 @@ class ReleaseSdist(sdist):
 
 setup(
     name="hermes-claude-bridge",
-    version="0.5.0",
+    version="0.5.1",
     description="Hermes provider plugin for the pi-claude-cli Claude worker",
     long_description=(ROOT / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",

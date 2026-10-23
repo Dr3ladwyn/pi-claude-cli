@@ -14,7 +14,7 @@ def default_worker_path(plugin_root: Path) -> Path:
     cache = Path(configured).expanduser() if configured else Path.home() / ".cache" / "hermes-claude-bridge"
     system = platform.system().lower()
     architecture = {"x86_64": "x64", "amd64": "x64", "aarch64": "arm64", "arm64": "arm64"}.get(platform.machine().lower(), platform.machine().lower())
-    return cache / "0.5.0" / system / architecture / "plugin" / "runtime" / "src" / "adapters" / "hermes-worker" / "index.js"
+    return cache / "0.5.1" / system / architecture / "plugin" / "runtime" / "src" / "adapters" / "hermes-worker" / "index.js"
 
 
 def require_worker(path: Path) -> Path:

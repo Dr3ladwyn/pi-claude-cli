@@ -1,19 +1,19 @@
 # hermes-claude-bridge
 
-`hermes-claude-bridge` 0.5.0 is the Python distribution for the existing `pi-claude-cli` Hermes provider. It installs a standard `hermes_agent.plugins` entry point and the `hermes-claude-bridge` setup/status command. Importing the package or discovering the provider doesn't download, build, or start the worker and doesn't inspect Claude authentication.
+`hermes-claude-bridge` 0.5.1 is the Python distribution for the existing `pi-claude-cli` Hermes provider. It installs a standard `hermes_agent.plugins` entry point and the `hermes-claude-bridge` setup/status command. Importing the package or discovering the provider doesn't download, build, or start the worker and doesn't inspect Claude authentication.
 
 Python 3.10+ and Node.js 22.19+ are required. The initial release worker is Linux x64 only. Other platforms fail with a supported-platform message.
 
 ## Install and set up
 
 ```nu
-python -m pip install hermes-claude-bridge==0.5.0
+python -m pip install hermes-claude-bridge==0.5.1
 hermes-claude-bridge setup
 hermes-claude-bridge status
 hermes plugins enable pi-claude-cli
 ```
 
-`setup` downloads only the Linux x64 asset named by the release manifest embedded in this wheel, from the immutable `ramarivera/pi-claude-cli` GitHub release tag `v0.5.0`. It checks SHA256, extracts only regular files and directories, checks artifact version/provider/protocol/platform metadata, then atomically installs under `~/.cache/hermes-claude-bridge/0.5.0/linux/x64`. Set `HERMES_CLAUDE_BRIDGE_CACHE` to choose a different cache root. Setup never changes a selected provider, profile, credentials, or login state. A matching cache is reused; an unowned or different artifact is never overwritten.
+`setup` downloads only the Linux x64 asset named by the release manifest embedded in this wheel, from the immutable `ramarivera/pi-claude-cli` GitHub release tag `v0.5.1`. It checks SHA256, extracts only regular files and directories, checks artifact version/provider/protocol/platform metadata, then atomically installs under `~/.cache/hermes-claude-bridge/0.5.1/linux/x64`. Set `HERMES_CLAUDE_BRIDGE_CACHE` to choose a different cache root. Setup never changes a selected provider, profile, credentials, or login state. A matching cache is reused; an unowned or different artifact is never overwritten.
 
 The installed plugin continues to use provider id `pi-claude-cli` and the same native signed carrier and cached-client behavior as the local bundle. Local bundles prefer their sibling `runtime/` directory. Pip installations resolve the explicitly set-up worker cache.
 

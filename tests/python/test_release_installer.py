@@ -24,14 +24,14 @@ class ReleaseInstallerRegressionTests(unittest.TestCase):
         payload = b"labelled fixture archive bytes"
         response = FixtureResponse(payload, "https://release-assets.githubusercontent.com/github-production-release-asset/fixture?signature=fixture")
         with tempfile.TemporaryDirectory() as directory, patch("urllib.request.urlopen", return_value=response):
-            downloaded = _download("https://github.com/ramarivera/pi-claude-cli/releases/download/v0.5.0/fixture.tar.gz", hashlib.sha256(payload).hexdigest(), Path(directory))
+            downloaded = _download("https://github.com/ramarivera/pi-claude-cli/releases/download/v0.5.1/fixture.tar.gz", hashlib.sha256(payload).hexdigest(), Path(directory))
             self.assertEqual(downloaded.read_bytes(), payload)
 
     def test_foreign_redirect_remains_rejected(self):
         response = FixtureResponse(b"fixture", "https://untrusted.invalid/fixture")
         with tempfile.TemporaryDirectory() as directory, patch("urllib.request.urlopen", return_value=response):
             with self.assertRaisesRegex(ValueError, "redirect"):
-                _download("https://github.com/ramarivera/pi-claude-cli/releases/download/v0.5.0/fixture.tar.gz", "0" * 64, Path(directory))
+                _download("https://github.com/ramarivera/pi-claude-cli/releases/download/v0.5.1/fixture.tar.gz", "0" * 64, Path(directory))
 
     def test_executable_modes_survive_without_privileged_permission_bits(self):
         with tempfile.TemporaryDirectory() as directory:
