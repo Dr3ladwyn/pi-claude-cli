@@ -32,7 +32,7 @@ If an inherited `PI_CLAUDE_EXECUTABLE` is set, remove that override from the lau
 
 The aliases `opus`, `sonnet` and `haiku` are passed to the official runtime so it chooses the current corresponding model. The bridge uses a conservative 200,000-token context budget. This is not a claim that every account has the same maximum context entitlement.
 
-`PI_CLAUDE_DRIVER=cli` remains the shared runtime's default. That driver deliberately requires unmodified Claude Code **2.1.285**. Set `PI_CLAUDE_EXECUTABLE` to an existing supported executable if the global CLI is newer. A mismatched version fails before inference. Do not remove the compatibility guard or silently route to another driver.
+`PI_CLAUDE_DRIVER=cli` remains the shared runtime's default. That driver requires Claude Code **2.1.285 or newer** and accepts versions below 2.2.0 silently. Newer versions warn once and continue; set `PI_CLAUDE_CLI_STRICT_VERSION=1` to reject them before inference. Versions below the minimum and malformed version output always fail. `PI_CLAUDE_EXECUTABLE` can select an existing executable explicitly. See the [supported range policy](../docs/compatibility.md).
 
 The bridge needs Node.js 22.19.0 or later and a Hermes installation with the external-process provider and provider-owned replay contracts. It was exercised against Hermes revision `0438ca2da53bf9caa4af4a5dacc0b2757a6ba3b9` with managed Python 3.14.7 on Linux x64. Older Hermes revisions and macOS/Windows live behavior are not qualified by that test.
 

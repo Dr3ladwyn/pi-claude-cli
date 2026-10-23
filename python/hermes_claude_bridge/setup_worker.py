@@ -12,7 +12,7 @@ import urllib.request
 from urllib.parse import urlparse
 from pathlib import Path, PurePosixPath
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 PROVIDER_ID = "pi-claude-cli"
 PROTOCOL_VERSION = 1
 RELEASE_REPO = "ramarivera/pi-claude-cli"
@@ -67,7 +67,7 @@ def load_manifest(path: Path) -> dict:
     try:
         manifest = _validate_manifest(json.loads(path.read_text(encoding="utf-8")))
     except FileNotFoundError as error:
-        raise RuntimeError("Worker manifest is missing from this distribution. Reinstall the hermes-claude-bridge 0.5.0 wheel that includes its release manifest.") from error
+        raise RuntimeError("Worker manifest is missing from this distribution. Reinstall the hermes-claude-bridge 0.5.1 wheel that includes its release manifest.") from error
     return manifest
 
 
@@ -135,7 +135,7 @@ def _validate_artifact(root: Path) -> dict:
 
 
 def _download(url: str, expected_sha256: str, cache: Path) -> Path:
-    request = urllib.request.Request(url, headers={"User-Agent": "hermes-claude-bridge/0.5.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "hermes-claude-bridge/0.5.1"})
     downloaded: Path | None = None
     try:
         with urllib.request.urlopen(request, timeout=60) as response:

@@ -19,15 +19,15 @@ spec.loader.exec_module(locator)
 
 class CacheOwnershipTests(unittest.TestCase):
     def cache(self, root):
-        target = root / '0.5.0/linux/x64'
+        target = root / '0.5.1/linux/x64'
         worker = target / 'plugin/runtime/src/adapters/hermes-worker/index.js'
         worker.parent.mkdir(parents=True)
         worker.write_text('// labelled fixture, never executed\n')
-        metadata = {'artifactFormat': 1, 'providerId': 'pi-claude-cli', 'packageVersion': '0.5.0', 'workerProtocolVersion': 1, 'nodeEngine': '>=22.19.0', 'buildPlatform': 'linux', 'buildArchitecture': 'x64'}
+        metadata = {'artifactFormat': 1, 'providerId': 'pi-claude-cli', 'packageVersion': '0.5.1', 'workerProtocolVersion': 1, 'nodeEngine': '>=22.19.0', 'buildPlatform': 'linux', 'buildArchitecture': 'x64'}
         (target / 'artifact.json').write_text(json.dumps(metadata))
         (target / 'plugin/plugin.yaml').write_text('name: pi-claude-cli\n')
-        (target / '.hermes-claude-bridge-owner.json').write_text(json.dumps({'packageVersion': '0.5.0', 'sha256': 'a' * 64}))
-        manifest = {'manifestVersion': 1, 'packageVersion': '0.5.0', 'providerId': 'pi-claude-cli', 'workerProtocolVersion': 1, 'artifacts': [{'platform': 'linux', 'architecture': 'x64', 'asset': 'labelled-fixture.tar.gz', 'sha256': 'a' * 64}]}
+        (target / '.hermes-claude-bridge-owner.json').write_text(json.dumps({'packageVersion': '0.5.1', 'sha256': 'a' * 64}))
+        manifest = {'manifestVersion': 1, 'packageVersion': '0.5.1', 'providerId': 'pi-claude-cli', 'workerProtocolVersion': 1, 'artifacts': [{'platform': 'linux', 'architecture': 'x64', 'asset': 'labelled-fixture.tar.gz', 'sha256': 'a' * 64}]}
         return target, worker, manifest
 
     def test_non_object_owner_is_controlled_in_status_and_setup(self):
@@ -93,7 +93,7 @@ class CacheOwnershipTests(unittest.TestCase):
             root = Path(directory)
             fixture_root = root / 'fixture-source'
             _, _, manifest = self.cache(fixture_root)
-            target = fixture_root / '0.5.0/linux/x64'
+            target = fixture_root / '0.5.1/linux/x64'
             archive = root / 'labelled-fixture.tar.gz'
             with tarfile.open(archive, 'w:gz') as tar:
                 for path in sorted(target.rglob('*')):

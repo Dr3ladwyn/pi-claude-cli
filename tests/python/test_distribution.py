@@ -27,7 +27,7 @@ require_worker = _locator.require_worker
 class DistributionTests(unittest.TestCase):
     def test_import_is_lazy(self) -> None:
         modules = __import__("sys").modules
-        self.assertEqual(__version__, "0.5.0")
+        self.assertEqual(__version__, "0.5.1")
         self.assertNotIn("providers", modules)
         self.assertNotIn("hermes_claude_bridge.provider", modules)
 
@@ -45,7 +45,7 @@ class DistributionTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "setup.*first"):
                     require_worker(bundled)
                 shutil.rmtree(plugin / "runtime")
-                cached = root / "cache/0.5.0/linux/x64/plugin/runtime/src/adapters/hermes-worker/index.js"
+                cached = root / "cache/0.5.1/linux/x64/plugin/runtime/src/adapters/hermes-worker/index.js"
                 self.assertEqual(default_worker_path(plugin), cached)
                 with self.assertRaisesRegex(RuntimeError, "setup.*first"):
                     require_worker(cached)
@@ -59,21 +59,21 @@ class DistributionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             archive = root / "fixture.tar.gz"
-            metadata = {"artifactFormat": 1, "providerId": "pi-claude-cli", "packageVersion": "0.5.0", "workerProtocolVersion": 1, "nodeEngine": ">=22.19.0", "buildPlatform": "linux", "buildArchitecture": "x64"}
+            metadata = {"artifactFormat": 1, "providerId": "pi-claude-cli", "packageVersion": "0.5.1", "workerProtocolVersion": 1, "nodeEngine": ">=22.19.0", "buildPlatform": "linux", "buildArchitecture": "x64"}
             with tarfile.open(archive, "w:gz") as tar:
                 for name, data in (("artifact.json", json.dumps(metadata).encode()), ("plugin/plugin.yaml", b"name: pi-claude-cli\n"), ("plugin/runtime/src/adapters/hermes-worker/index.js", b"process.stdout.write('fixture')\n")):
                     info = tarfile.TarInfo(name)
                     info.size = len(data)
                     tar.addfile(info, io.BytesIO(data))
-            manifest = {"manifestVersion": 1, "packageVersion": "0.5.0", "providerId": "pi-claude-cli", "workerProtocolVersion": 1, "artifacts": [{"platform": "linux", "architecture": "x64", "asset": archive.name, "sha256": hashlib.sha256(archive.read_bytes()).hexdigest()}]}
+            manifest = {"manifestVersion": 1, "packageVersion": "0.5.1", "providerId": "pi-claude-cli", "workerProtocolVersion": 1, "artifacts": [{"platform": "linux", "architecture": "x64", "asset": archive.name, "sha256": hashlib.sha256(archive.read_bytes()).hexdigest()}]}
             manifest_path = root / "worker-manifest.json"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             target = root / "cache"
             installed = install_worker(manifest_path=manifest_path, local_artifact=archive, cache_root=target)
             self.assertTrue((installed / "plugin/runtime/src/adapters/hermes-worker/index.js").is_file())
-            self.assertEqual(json.loads((installed / "artifact.json").read_text())["packageVersion"], "0.5.0")
+            self.assertEqual(json.loads((installed / "artifact.json").read_text())["packageVersion"], "0.5.1")
             self.assertEqual(install_worker(manifest_path=manifest_path, local_artifact=archive, cache_root=target), installed)
-            foreign_target = root / "foreign/0.5.0/linux/x64"
+            foreign_target = root / "foreign/0.5.1/linux/x64"
             foreign_target.mkdir(parents=True)
             marker = foreign_target / "do-not-replace"
             marker.write_text("foreign owner", encoding="utf-8")
@@ -90,7 +90,7 @@ class DistributionTests(unittest.TestCase):
                 payload = b"bad"
                 info.size = len(payload)
                 tar.addfile(info, io.BytesIO(payload))
-            manifest = {"manifestVersion": 1, "packageVersion": "0.5.0", "providerId": "pi-claude-cli", "workerProtocolVersion": 1, "artifacts": [{"platform": "linux", "architecture": "x64", "asset": archive.name, "sha256": "0" * 64}]}
+            manifest = {"manifestVersion": 1, "packageVersion": "0.5.1", "providerId": "pi-claude-cli", "workerProtocolVersion": 1, "artifacts": [{"platform": "linux", "architecture": "x64", "asset": archive.name, "sha256": "0" * 64}]}
             path = root / "manifest.json"
             path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "SHA256"):

@@ -27,8 +27,16 @@ import { ControlChannel } from "./controls.js";
 import { PromptReceipts } from "../prompt-receipts.js";
 import { HOST_MCP_NAME, hostToolSystemPrompt } from "../host-tool-prompt.js";
 
+import { createVersionCheck } from "../../version-policy.js";
+
 const HOST_SERVER = HOST_MCP_NAME;
-const SUPPORTED_VERSION = "2.1.285";
+export const MINIMUM_CLAUDE_VERSION = "2.1.285";
+export const SUPPORTED_CLAUDE_RANGE = ">=2.1.285 <2.2.0";
+const assertClaudeVersion = createVersionCheck(
+  "Claude CLI",
+  MINIMUM_CLAUDE_VERSION,
+  "2.2.0",
+);
 const MAX_FRAME = 1024 * 1024;
 const AUTH_OVERRIDES = [
   "ANTHROPIC_API_KEY",
@@ -99,16 +107,15 @@ function preflight(
           );
           return;
         }
-        if (
-          !new RegExp(
-            `^${SUPPORTED_VERSION.replaceAll(".", "\\.")}(?:\\s|$)`,
-          ).test(stdout.trim())
-        ) {
-          reject(
-            new Error(
-              `Unsupported Claude CLI version; requires ${SUPPORTED_VERSION}`,
-            ),
+        try {
+          // Official --version is a stable triplet with an optional parenthesized
+          // product label. Anchor the whole output so banners/extra lines fail.
+          const match = /^(\d+\.\d+\.\d+)(?:[ \t]+\([^()\r\n]+\))?$/.exec(
+            stdout.trim(),
           );
+          assertClaudeVersion(match?.[1] ?? "", env);
+        } catch (error) {
+          reject(error);
           return;
         }
         resolve();

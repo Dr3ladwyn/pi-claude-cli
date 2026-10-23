@@ -7,8 +7,8 @@ Select the `pi-claude-cli` provider in the host's model picker. CLI is the defau
 ## Install the release
 
 ```text
-pi install npm:@ramarivera/pi-claude-cli@0.4.2
-omp plugin install @ramarivera/pi-claude-cli@0.4.2
+pi install npm:@ramarivera/pi-claude-cli@0.5.1
+omp plugin install @ramarivera/pi-claude-cli@0.5.1
 ```
 
 Authenticate with `claude auth login`, restart your host, and select a `pi-claude-cli/...` model. The npm package name is scoped; the provider ID stays `pi-claude-cli`. See [release instructions](docs/releasing.md) and [supported versions](docs/compatibility.md).
@@ -37,7 +37,7 @@ The package manifest exposes `pi.extensions` and `omp.extensions` for each host'
 For the published Python distribution, install into the interpreter that runs Hermes, then explicitly download and verify its worker before model calls:
 
 ```nu
-python -m pip install hermes-claude-bridge==0.5.0
+python -m pip install hermes-claude-bridge==0.5.1
 hermes-claude-bridge setup
 hermes-claude-bridge status
 hermes plugins enable pi-claude-cli
@@ -56,7 +56,7 @@ let profile_home = ($env.HERMES_HOME? | default ($env.HOME | path join ".hermes"
 with-env { PI_CLAUDE_DRIVER: "sdk" } { hermes --provider pi-claude-cli -m opus }
 ```
 
-Select `pi-claude-cli` in Hermes's model picker. The SDK route above uses its version-paired official runtime. The shared default CLI driver deliberately requires Claude Code 2.1.285; a newer global binary is rejected unless you select an existing supported executable. `PI_CLAUDE_AUTH=api-key` is an explicit billing choice and uses the existing `ANTHROPIC_API_KEY` configuration. The plugin doesn't read Hermes/Pi OAuth credentials or provide subscription usage. The installer refuses an existing provider directory and doesn't change active model or login settings. See [Hermes installation, behavior and limits](hermes/README.md).
+Select `pi-claude-cli` in Hermes's model picker. The SDK route above uses its version-paired official runtime. The shared default CLI driver requires Claude Code 2.1.285 or newer. Versions below 2.2.0 are accepted silently; newer versions warn once and continue. Set `PI_CLAUDE_CLI_STRICT_VERSION=1` to reject versions above the supported range. Pi follows the same policy with `>=0.99.1 <0.100.0`. `PI_CLAUDE_AUTH=api-key` is an explicit billing choice and uses the existing `ANTHROPIC_API_KEY` configuration. The plugin doesn't read Hermes/Pi OAuth credentials or provide subscription usage. The installer refuses an existing provider directory and doesn't change active model or login settings. See [Hermes installation, behavior and limits](hermes/README.md).
 
 ## Tools and sessions
 

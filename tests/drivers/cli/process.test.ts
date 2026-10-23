@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { chmod, mkdtemp, readFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -108,6 +108,7 @@ const normalizer: DriverFactoryOptions["normalizerFactory"] = () => ({
 const cleanup: (() => Promise<void>)[] = [];
 afterEach(async () => {
   for (const dispose of cleanup.splice(0).reverse()) await dispose();
+  vi.restoreAllMocks();
 });
 async function open(
   extraEnv: Record<string, string | undefined> = {},
@@ -527,8 +528,53 @@ describe("CLI resident process (offline child double)", () => {
   });
   it("fails version preflight before resident startup/inference", async () => {
     await expect(open({ PCC_VERSION: "2.1.284" })).rejects.toThrow(
-      "requires 2.1.285",
+      "requires Claude CLI 2.1.285",
     );
+  });
+  it.each(["2.1.285", "2.1.286", "2.1.999"])(
+    "accepts supported Claude %s silently",
+    async (version) => {
+      const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const { session, iterator } = await open({ PCC_VERSION: version });
+      await prompt(session, "version-policy");
+      await until(iterator, (event) => event.type === "turn_end");
+      expect(warning).not.toHaveBeenCalled();
+    },
+  );
+  it("warns once across drivers and sessions above the tested Claude range", async () => {
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    for (const version of ["2.2.0", "3.0.0"]) {
+      const { session, iterator } = await open({ PCC_VERSION: version });
+      await prompt(session, "untested-version");
+      await until(iterator, (event) => event.type === "turn_end");
+      await session.close();
+    }
+    expect(warning).toHaveBeenCalledTimes(1);
+    expect(warning.mock.calls[0]?.[0]).toContain(">=2.1.285 <2.2.0");
+    expect(warning.mock.calls[0]?.[0]).toContain(
+      "PI_CLAUDE_CLI_STRICT_VERSION=1",
+    );
+  });
+  it.each(["garbage", "2.1", "2.1.285evil", "02.1.285", "2.1.285\n3.0.0"])(
+    "rejects malformed Claude version output %j before startup",
+    async (version) => {
+      await expect(open({ PCC_VERSION: version })).rejects.toThrow(
+        "requires Claude CLI 2.1.285",
+      );
+    },
+  );
+  it("enforces strict mode from the driver environment even after a warning", async () => {
+    await expect(
+      open({
+        PCC_VERSION: "2.2.0",
+        PI_CLAUDE_CLI_STRICT_VERSION: "1",
+      }),
+    ).rejects.toThrow("strict version mode");
+    const { session } = await open({
+      PCC_VERSION: "2.1.286",
+      PI_CLAUDE_CLI_STRICT_VERSION: "1",
+    });
+    await session.close();
   });
   it("reports an unavailable executable preflight without exposing env", async () => {
     const driver = createCliDriver({

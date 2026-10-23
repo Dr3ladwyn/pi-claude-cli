@@ -1,4 +1,4 @@
 name: pi-claude-cli
 kind: model-provider
-version: 0.5.0
+version: 0.5.1
 description: Hermes adapter for the resident pi-claude-cli Claude runtime

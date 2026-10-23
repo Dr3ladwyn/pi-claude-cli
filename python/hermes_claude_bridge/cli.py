@@ -28,7 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, RuntimeError, ValueError) as error:
         print(f"hermes-claude-bridge: {error}", file=sys.stderr)
         if args.command == "setup":
-            print("Install the hermes-claude-bridge 0.5.0 wheel with its embedded Linux x64 worker manifest, then run `hermes-claude-bridge setup`.", file=sys.stderr)
+            print("Install the hermes-claude-bridge 0.5.1 wheel with its embedded Linux x64 worker manifest, then run `hermes-claude-bridge setup`.", file=sys.stderr)
         return 2
 
 
